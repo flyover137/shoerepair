@@ -1,0 +1,455 @@
+---
+import { tickets } from '../data/tickets';
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" href="/favicon.ico" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<meta name="description" content="Track your shoe repairs at Main Street Shoe Repair using our minimalist, real-time repair tracker." />
+		<title>Main Street Shoe Repair - Customer Repair Tracker</title>
+		
+		<!-- Google Fonts Inter -->
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+		<style>
+			:root {
+				--bg-color: #f8fafc;
+				--card-bg: #ffffff;
+				--text-color: #0f172a;
+				--text-muted: #64748b;
+				--border-color: #e2e8f0;
+				--input-bg: #ffffff;
+				--input-focus-border: #4f46e5;
+				--input-focus-ring: rgba(79, 70, 229, 0.15);
+				
+				--status-waiting-bg: #fef3c7;
+				--status-waiting-text: #b45309;
+				--status-waiting-border: #fde68a;
+				
+				--status-working-bg: #dbeafe;
+				--status-working-text: #1d4ed8;
+				--status-working-border: #bfdbfe;
+				
+				--status-ready-bg: #d1fae5;
+				--status-ready-text: #047857;
+				--status-ready-border: #a7f3d0;
+
+				--shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+				--shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+				--shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+				
+				--font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+			}
+
+			@media (prefers-color-scheme: dark) {
+				:root {
+					--bg-color: #0f172a;
+					--card-bg: #1e293b;
+					--text-color: #f8fafc;
+					--text-muted: #94a3b8;
+					--border-color: #334155;
+					--input-bg: #1e293b;
+					--input-focus-border: #818cf8;
+					--input-focus-ring: rgba(129, 140, 248, 0.2);
+					
+					--status-waiting-bg: rgba(251, 191, 36, 0.1);
+					--status-waiting-text: #fbbf24;
+					--status-waiting-border: rgba(251, 191, 36, 0.3);
+					
+					--status-working-bg: rgba(96, 165, 250, 0.1);
+					--status-working-text: #60a5fa;
+					--status-working-border: rgba(96, 165, 250, 0.3);
+					
+					--status-ready-bg: rgba(52, 211, 153, 0.1);
+					--status-ready-text: #34d399;
+					--status-ready-border: rgba(52, 211, 153, 0.3);
+				}
+			}
+
+			* {
+				box-sizing: border-box;
+				margin: 0;
+				padding: 0;
+			}
+
+			body {
+				background-color: var(--bg-color);
+				color: var(--text-color);
+				font-family: var(--font-sans);
+				line-height: 1.5;
+				-webkit-font-smoothing: antialiased;
+				-moz-osx-font-smoothing: grayscale;
+				min-height: 100vh;
+				padding: 2rem 1rem;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				transition: background-color 0.3s ease, color 0.3s ease;
+			}
+
+			main {
+				width: 100%;
+				max-width: 800px;
+				margin: 0 auto;
+			}
+
+			header {
+				text-align: center;
+				margin-bottom: 2.5rem;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+			}
+
+			.logo-container {
+				background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%);
+				color: white;
+				width: 4rem;
+				height: 4rem;
+				border-radius: 1rem;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				margin-bottom: 1rem;
+				box-shadow: var(--shadow-md);
+			}
+
+			.logo-icon {
+				width: 2.25rem;
+				height: 2.25rem;
+			}
+
+			h1 {
+				font-size: 2.25rem;
+				font-weight: 700;
+				letter-spacing: -0.025em;
+				margin-bottom: 0.25rem;
+				background: linear-gradient(135deg, var(--text-color) 40%, var(--text-muted) 100%);
+				-webkit-background-clip: text;
+				-webkit-text-fill-color: transparent;
+			}
+
+			.subtitle {
+				font-size: 1.125rem;
+				color: var(--text-muted);
+				font-weight: 500;
+			}
+
+			.card {
+				background-color: var(--card-bg);
+				border: 1px solid var(--border-color);
+				border-radius: 1rem;
+				box-shadow: var(--shadow-lg);
+				padding: 1.5rem;
+				margin-bottom: 2rem;
+				transition: border-color 0.3s ease, background-color 0.3s ease;
+			}
+
+			.search-bar-container {
+				margin-bottom: 1.5rem;
+				display: flex;
+				flex-direction: column;
+				gap: 0.75rem;
+			}
+
+			.search-wrapper {
+				position: relative;
+				display: flex;
+				align-items: center;
+			}
+
+			.search-icon-svg {
+				position: absolute;
+				left: 1rem;
+				width: 1.25rem;
+				height: 1.25rem;
+				color: var(--text-muted);
+				pointer-events: none;
+			}
+
+			.search-input {
+				width: 100%;
+				padding: 0.875rem 1rem 0.875rem 2.75rem;
+				font-size: 1rem;
+				font-family: inherit;
+				color: var(--text-color);
+				background-color: var(--input-bg);
+				border: 1px solid var(--border-color);
+				border-radius: 0.75rem;
+				outline: none;
+				box-shadow: var(--shadow-sm);
+				transition: border-color 0.2s ease, box-shadow 0.2s ease;
+			}
+
+			.search-input:focus {
+				border-color: var(--input-focus-border);
+				box-shadow: var(--shadow-sm), 0 0 0 4px var(--input-focus-ring);
+			}
+
+			.search-input::placeholder {
+				color: var(--text-muted);
+				opacity: 0.8;
+			}
+
+			.info-strip {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				font-size: 0.875rem;
+				color: var(--text-muted);
+				font-weight: 500;
+				border-bottom: 1px solid var(--border-color);
+				padding-bottom: 0.75rem;
+				margin-bottom: 0.75rem;
+			}
+
+			.table-container {
+				overflow-x: auto;
+				width: 100%;
+			}
+
+			table {
+				width: 100%;
+				border-collapse: collapse;
+				text-align: left;
+				font-size: 0.95rem;
+			}
+
+			th {
+				font-weight: 600;
+				color: var(--text-muted);
+				padding: 0.75rem 1rem;
+				border-bottom: 1px solid var(--border-color);
+				font-size: 0.85rem;
+				text-transform: uppercase;
+				letter-spacing: 0.05em;
+			}
+
+			td {
+				padding: 1rem;
+				border-bottom: 1px solid var(--border-color);
+				color: var(--text-color);
+				vertical-align: middle;
+			}
+
+			tr:last-child td {
+				border-bottom: none;
+			}
+
+			tr {
+				transition: background-color 0.15s ease;
+			}
+
+			tbody tr:not(#no-results):hover {
+				background-color: rgba(0, 0, 0, 0.02);
+			}
+
+			@media (prefers-color-scheme: dark) {
+				tbody tr:not(#no-results):hover {
+					background-color: rgba(255, 255, 255, 0.02);
+				}
+			}
+
+			.ticket-num {
+				font-family: monospace;
+				font-weight: 700;
+				font-size: 1rem;
+				color: var(--text-color);
+			}
+
+			.ticket-date {
+				color: var(--text-muted);
+				font-size: 0.875rem;
+			}
+
+			.shoe-desc {
+				font-weight: 500;
+			}
+
+			.badge {
+				display: inline-flex;
+				align-items: center;
+				padding: 0.25rem 0.75rem;
+				font-size: 0.75rem;
+				font-weight: 600;
+				border-radius: 9999px;
+				text-transform: uppercase;
+				letter-spacing: 0.05em;
+				border: 1px solid transparent;
+				line-height: 1.2;
+			}
+
+			.badge-waiting {
+				background-color: var(--status-waiting-bg);
+				color: var(--status-waiting-text);
+				border-color: var(--status-waiting-border);
+			}
+
+			.badge-working {
+				background-color: var(--status-working-bg);
+				color: var(--status-working-text);
+				border-color: var(--status-working-border);
+			}
+
+			.badge-ready {
+				background-color: var(--status-ready-bg);
+				color: var(--status-ready-text);
+				border-color: var(--status-ready-border);
+			}
+
+			#no-results {
+				display: none;
+			}
+
+			.no-results-box {
+				text-align: center;
+				padding: 3rem 1rem;
+				color: var(--text-muted);
+			}
+
+			.no-results-icon {
+				width: 3rem;
+				height: 3rem;
+				margin-bottom: 0.75rem;
+				color: var(--text-muted);
+				opacity: 0.5;
+			}
+
+			footer {
+				text-align: center;
+				margin-top: auto;
+				padding-top: 2rem;
+				font-size: 0.875rem;
+				color: var(--text-muted);
+				border-top: 1px solid var(--border-color);
+				width: 100%;
+				max-width: 800px;
+			}
+
+			/* Subtle custom animation on hover */
+			.logo-container:hover .logo-icon {
+				transform: rotate(-10deg) scale(1.05);
+				transition: transform 0.2s ease;
+			}
+		</style>
+	</head>
+	<body>
+		<main>
+			<header>
+				<div class="logo-container">
+					<!-- Clean modern shoe logo -->
+					<svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+						<path d="M4 16v-2a4 4 0 0 1 4-4h4l5-6h3v4l-3 4v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z" />
+						<path d="M14 10v10" />
+					</svg>
+				</div>
+				<h1>Main Street Shoe Repair</h1>
+				<p class="subtitle">Customer Repair Tracker</p>
+			</header>
+
+			<section class="card">
+				<div class="search-bar-container">
+					<div class="search-wrapper">
+						<svg class="search-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<circle cx="11" cy="11" r="8"></circle>
+							<line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+						</svg>
+						<input 
+							type="search" 
+							id="ticket-search" 
+							class="search-input" 
+							placeholder="Enter ticket number (e.g. 1005)..." 
+							aria-label="Search repair tickets by number" 
+							autocomplete="off"
+						/>
+					</div>
+				</div>
+
+				<div class="info-strip">
+					<span id="status-summary">Showing 8 of 8 tickets</span>
+					<span>Last Updated: Just Now</span>
+				</div>
+
+				<div class="table-container">
+					<table>
+						<thead>
+							<tr>
+								<th>Ticket #</th>
+								<th>Date Received</th>
+								<th>Shoe Description</th>
+								<th>Status</th>
+							</tr>
+						</thead>
+						<tbody>
+							{tickets.map(ticket => (
+								<tr data-ticket-number={ticket.ticketNumber}>
+									<td class="ticket-num">#{ticket.ticketNumber}</td>
+									<td class="ticket-date">{ticket.ticketDate}</td>
+									<td class="shoe-desc">{ticket.shoeDescription}</td>
+									<td>
+										<span class={`badge badge-${ticket.status}`}>
+											{ticket.status}
+										</span>
+									</td>
+								</tr>
+							))}
+							<tr id="no-results">
+								<td colspan="4">
+									<div class="no-results-box">
+										<svg class="no-results-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+											<circle cx="12" cy="12" r="10"></circle>
+											<line x1="12" y1="8" x2="12" y2="12"></line>
+											<line x1="12" y1="16" x2="12.01" y2="16"></line>
+										</svg>
+										<p>No tickets found matching that number.</p>
+									</div>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</section>
+
+			<footer>
+				<p>&copy; {new Date().getFullYear()} Main Street Shoe Repair. All rights reserved.</p>
+			</footer>
+		</main>
+
+		<script>
+			// Client-side instant filtering logic
+			const searchInput = document.getElementById('ticket-search') as HTMLInputElement;
+			const tableRows = document.querySelectorAll('tbody tr:not(#no-results)') as NodeListOf<HTMLTableRowElement>;
+			const summaryText = document.getElementById('status-summary') as HTMLParagraphElement;
+			const noResultsRow = document.getElementById('no-results') as HTMLTableRowElement;
+
+			searchInput?.addEventListener('input', () => {
+				const query = searchInput.value.trim().toLowerCase();
+				let visibleCount = 0;
+
+				tableRows.forEach(row => {
+					const ticketNumber = row.getAttribute('data-ticket-number') || '';
+					if (ticketNumber.toLowerCase().includes(query)) {
+						row.style.display = '';
+						visibleCount++;
+					} else {
+						row.style.display = 'none';
+					}
+				});
+
+				if (visibleCount === 0) {
+					if (noResultsRow) noResultsRow.style.display = 'table-row';
+					if (summaryText) summaryText.textContent = `No tickets found matching "${searchInput.value}"`;
+				} else {
+					if (noResultsRow) noResultsRow.style.display = 'none';
+					if (summaryText) summaryText.textContent = `Showing ${visibleCount} of ${tableRows.length} tickets`;
+				}
+			});
+		</script>
+	</body>
+</html>
