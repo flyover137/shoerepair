@@ -11,8 +11,8 @@ media_folder: "public/images"
 public_folder: "/images"
 
 collections:
-  - name: "settings"
-    label: "Settings"
+  - name: "repair_tracker"
+    label: "Repair Tracker"
     files:
       - name: "tickets"
         label: "Repair Tickets"
