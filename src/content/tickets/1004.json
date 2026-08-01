@@ -1,5 +1,6 @@
 {
   "ticketNumber": "1004",
+  "customerName": "Emily Brown",
   "ticketDate": "2026-07-30",
   "shoeDescription": "Work Boots stitching",
   "status": "working"

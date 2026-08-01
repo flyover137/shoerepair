@@ -1,5 +1,6 @@
 {
   "ticketNumber": "1009",
+  "customerName": "James Anderson",
   "ticketDate": "2026-08-01",
   "shoeDescription": "Resoling Leather Shoe",
   "status": "ready"

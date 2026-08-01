@@ -20,6 +20,7 @@ collections:
     extension: "json"
     fields:
       - { label: "Ticket Number", name: "ticketNumber", widget: "string" }
+      - { label: "Customer Name", name: "customerName", widget: "string" }
       - { label: "Ticket Date", name: "ticketDate", widget: "datetime", date_only: true, format: "YYYY-MM-DD" }
       - { label: "Shoe Description", name: "shoeDescription", widget: "string" }
       - { label: "Status", name: "status", widget: "select", options: ["waiting", "working", "ready"] }
