@@ -24,3 +24,31 @@ collections:
       - { label: "Ticket Date", name: "ticketDate", widget: "datetime", date_only: true, format: "YYYY-MM-DD" }
       - { label: "Shoe Description", name: "shoeDescription", widget: "string" }
       - { label: "Status", name: "status", widget: "select", options: ["waiting", "working", "ready"] }
+
+  - name: "settings"
+    label: "Settings"
+    delete: false
+    files:
+      - name: "general"
+        label: "General Branding"
+        file: "src/content/settings/general.json"
+        format: "json"
+        fields:
+          - name: "general"
+            label: "Branding Details"
+            widget: "object"
+            fields:
+              - { label: "Brand Name", name: "brandName", widget: "string" }
+              - { label: "Subtitle", name: "subtitle", widget: "string" }
+              - { label: "Footer Text", name: "footerText", widget: "string" }
+      - name: "seo"
+        label: "SEO & Metadata"
+        file: "src/content/settings/seo.json"
+        format: "json"
+        fields:
+          - name: "seo"
+            label: "SEO Details"
+            widget: "object"
+            fields:
+              - { label: "SEO Title", name: "seoTitle", widget: "string" }
+              - { label: "SEO Meta Description", name: "seoDescription", widget: "text" }

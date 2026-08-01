@@ -1,5 +1,5 @@
 import { defineCollection } from 'astro:content';
-import { glob } from 'astro/loaders';
+import { glob, file } from 'astro/loaders';
 import { z } from 'astro/zod';
 
 const tickets = defineCollection({
@@ -13,4 +13,21 @@ const tickets = defineCollection({
   })
 });
 
-export const collections = { tickets };
+const generalSettings = defineCollection({
+  loader: file("src/content/settings/general.json"),
+  schema: z.object({
+    brandName: z.string(),
+    subtitle: z.string(),
+    footerText: z.string()
+  })
+});
+
+const seoSettings = defineCollection({
+  loader: file("src/content/settings/seo.json"),
+  schema: z.object({
+    seoTitle: z.string(),
+    seoDescription: z.string()
+  })
+});
+
+export const collections = { tickets, generalSettings, seoSettings };

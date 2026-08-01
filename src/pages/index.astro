@@ -1,8 +1,22 @@
 ---
-import { getCollection } from 'astro:content';
+import { getCollection, getEntry } from 'astro:content';
 
 const ticketEntries = await getCollection('tickets');
 const tickets = ticketEntries.map(entry => entry.data);
+
+// Fetch settings from content collections
+const generalEntry = await getEntry('generalSettings', 'general');
+const general = generalEntry ? generalEntry.data : {
+  brandName: "Main Street Shoe Repair",
+  subtitle: "Customer Repair Tracker",
+  footerText: "© 2026 Main Street Shoe Repair. All rights reserved."
+};
+
+const seoEntry = await getEntry('seoSettings', 'seo');
+const seo = seoEntry ? seoEntry.data : {
+  seoTitle: "Main Street Shoe Repair - Customer Repair Tracker",
+  seoDescription: "Track your shoe repairs at Main Street Shoe Repair using our minimalist, real-time repair tracker."
+};
 
 function formatName(fullName: string) {
   if (!fullName) return '';
@@ -21,8 +35,8 @@ function formatName(fullName: string) {
 		<link rel="icon" href="/favicon.ico" />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
-		<meta name="description" content="Track your shoe repairs at Main Street Shoe Repair using our minimalist, real-time repair tracker." />
-		<title>Main Street Shoe Repair - Customer Repair Tracker</title>
+		<meta name="description" content={seo.seoDescription} />
+		<title>{seo.seoTitle}</title>
 		
 		<!-- Google Fonts Inter -->
 		<link rel="preconnect" href="https://fonts.googleapis.com">
@@ -486,8 +500,8 @@ function formatName(fullName: string) {
 						</svg>
 					</div>
 					<div class="header-text">
-						<h1>Main Street Shoe Repair</h1>
-						<p class="subtitle">Customer Repair Tracker</p>
+						<h1>{general.brandName}</h1>
+						<p class="subtitle">{general.subtitle}</p>
 					</div>
 				</div>
 			</header>
@@ -599,7 +613,7 @@ function formatName(fullName: string) {
 			</section>
 
 			<footer>
-				<p>&copy; {new Date().getFullYear()} Main Street Shoe Repair. All rights reserved.</p>
+				<p>{general.footerText}</p>
 			</footer>
 		</main>
 
