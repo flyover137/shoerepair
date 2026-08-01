@@ -1,5 +1,8 @@
 ---
-import { tickets } from '../data/tickets';
+import { getCollection } from 'astro:content';
+
+const ticketEntries = await getCollection('tickets');
+const tickets = ticketEntries.map(entry => entry.data);
 ---
 
 <html lang="en">

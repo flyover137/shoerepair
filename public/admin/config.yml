@@ -11,20 +11,15 @@ media_folder: "public/images"
 public_folder: "/images"
 
 collections:
-  - name: "repair_tracker"
-    label: "Repair Tracker"
-    files:
-      - name: "tickets"
-        label: "Repair Tickets"
-        file: "src/data/tickets.json"
-        format: "json"
-        fields:
-          - name: "tickets"
-            label: "Tickets List"
-            widget: "list"
-            summary: "{{fields.ticketNumber}} - {{fields.shoeDescription}} ({{fields.status}})"
-            fields:
-              - { label: "Ticket Number", name: "ticketNumber", widget: "string" }
-              - { label: "Ticket Date", name: "ticketDate", widget: "datetime", date_only: true, format: "YYYY-MM-DD" }
-              - { label: "Shoe Description", name: "shoeDescription", widget: "string" }
-              - { label: "Status", name: "status", widget: "select", options: ["waiting", "working", "ready"] }
+  - name: "tickets"
+    label: "Repair Tickets"
+    folder: "src/content/tickets"
+    create: true
+    format: "json"
+    slug: "{{ticketNumber}}"
+    extension: "json"
+    fields:
+      - { label: "Ticket Number", name: "ticketNumber", widget: "string" }
+      - { label: "Ticket Date", name: "ticketDate", widget: "datetime", date_only: true, format: "YYYY-MM-DD" }
+      - { label: "Shoe Description", name: "shoeDescription", widget: "string" }
+      - { label: "Status", name: "status", widget: "select", options: ["waiting", "working", "ready"] }
