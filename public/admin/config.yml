@@ -2,8 +2,7 @@ backend:
   name: github
   repo: flyover137/shoerepair
   branch: main
-  base_url: https://shoerepair.pages.dev
-  auth_endpoint: api/auth
+  auth_methods: [token]
 
 # Enable local backend proxy for offline development
 local_backend: true
