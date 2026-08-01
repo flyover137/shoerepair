@@ -7,4 +7,4 @@ export interface Ticket {
   status: 'waiting' | 'working' | 'ready';
 }
 
-export const tickets = rawTickets as Ticket[];
+export const tickets = rawTickets.tickets as Ticket[];

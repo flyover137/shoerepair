@@ -1,50 +1,52 @@
-[
-  {
-    "ticketNumber": "1001",
-    "ticketDate": "2026-07-28",
-    "shoeDescription": "Leather Boots resole",
-    "status": "waiting"
-  },
-  {
-    "ticketNumber": "1002",
-    "ticketDate": "2026-07-29",
-    "shoeDescription": "Suede Loafers cleaning",
-    "status": "waiting"
-  },
-  {
-    "ticketNumber": "1003",
-    "ticketDate": "2026-07-27",
-    "shoeDescription": "Oxford Heel Replacement",
-    "status": "working"
-  },
-  {
-    "ticketNumber": "1004",
-    "ticketDate": "2026-07-30",
-    "shoeDescription": "Work Boots stitching",
-    "status": "working"
-  },
-  {
-    "ticketNumber": "1005",
-    "ticketDate": "2026-07-31",
-    "shoeDescription": "Sneaker Cleaning & Stitching",
-    "status": "ready"
-  },
-  {
-    "ticketNumber": "1006",
-    "ticketDate": "2026-07-26",
-    "shoeDescription": "Chelsea Boots zipper repair",
-    "status": "working"
-  },
-  {
-    "ticketNumber": "1007",
-    "ticketDate": "2026-07-25",
-    "shoeDescription": "Dress Shoes shine & sole",
-    "status": "ready"
-  },
-  {
-    "ticketNumber": "1008",
-    "ticketDate": "2026-07-24",
-    "shoeDescription": "Running Shoes patch",
-    "status": "ready"
-  }
-]
+{
+  "tickets": [
+    {
+      "ticketNumber": "1001",
+      "ticketDate": "2026-07-28",
+      "shoeDescription": "Leather Boots resole",
+      "status": "waiting"
+    },
+    {
+      "ticketNumber": "1002",
+      "ticketDate": "2026-07-29",
+      "shoeDescription": "Suede Loafers cleaning",
+      "status": "waiting"
+    },
+    {
+      "ticketNumber": "1003",
+      "ticketDate": "2026-07-27",
+      "shoeDescription": "Oxford Heel Replacement",
+      "status": "working"
+    },
+    {
+      "ticketNumber": "1004",
+      "ticketDate": "2026-07-30",
+      "shoeDescription": "Work Boots stitching",
+      "status": "working"
+    },
+    {
+      "ticketNumber": "1005",
+      "ticketDate": "2026-07-31",
+      "shoeDescription": "Sneaker Cleaning & Stitching",
+      "status": "ready"
+    },
+    {
+      "ticketNumber": "1006",
+      "ticketDate": "2026-07-26",
+      "shoeDescription": "Chelsea Boots zipper repair",
+      "status": "working"
+    },
+    {
+      "ticketNumber": "1007",
+      "ticketDate": "2026-07-25",
+      "shoeDescription": "Dress Shoes shine & sole",
+      "status": "ready"
+    },
+    {
+      "ticketNumber": "1008",
+      "ticketDate": "2026-07-24",
+      "shoeDescription": "Running Shoes patch",
+      "status": "ready"
+    }
+  ]
+}
