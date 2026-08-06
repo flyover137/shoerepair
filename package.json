@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "npm run build --prefix packages/astro-opening-hours && npm run build --prefix packages/astro-ticket-tracker && astro build",
     "preview": "astro preview",
     "astro": "astro"
   },
