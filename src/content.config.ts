@@ -1,16 +1,12 @@
 import { defineCollection } from 'astro:content';
 import { glob, file } from 'astro/loaders';
 import { z } from 'astro/zod';
+import { openingHoursConfigSchema } from 'astro-opening-hours';
+import { ticketSchema } from 'astro-progress-tracker';
 
 const tickets = defineCollection({
   loader: glob({ pattern: '**/*.json', base: './src/content/tickets' }),
-  schema: z.object({
-    ticketNumber: z.string(),
-    customerName: z.string(),
-    ticketDate: z.string(),
-    shoeDescription: z.string(),
-    status: z.enum(['waiting', 'working', 'ready'])
-  })
+  schema: ticketSchema
 });
 
 const generalSettings = defineCollection({
@@ -30,4 +26,10 @@ const seoSettings = defineCollection({
   })
 });
 
-export const collections = { tickets, generalSettings, seoSettings };
+const openingHoursSettings = defineCollection({
+  loader: file("src/content/settings/opening-hours.json"),
+  schema: openingHoursConfigSchema
+});
+
+export const collections = { tickets, generalSettings, seoSettings, openingHoursSettings };
+

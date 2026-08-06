@@ -2,6 +2,6 @@
   "ticketNumber": "1007",
   "customerName": "Elizabeth Taylor",
   "ticketDate": "2026-07-25",
-  "shoeDescription": "Dress Shoes shine & sole",
-  "status": "ready"
+  "status": "ready",
+  "itemDescription": "Dress Shoes shine & sole"
 }

@@ -1,0 +1,9 @@
+# astro-progress-tracker: Sveltia / Decap CMS Fields Configuration Template
+# Copy and paste this under your tickets collection configuration in config.yml:
+
+fields:
+  - { label: "Ticket Number", name: "ticketNumber", widget: "string" }
+  - { label: "Customer Name", name: "customerName", widget: "string" }
+  - { label: "Ticket Date", name: "ticketDate", widget: "datetime", date_only: true, format: "YYYY-MM-DD" }
+  - { label: "Item Description", name: "itemDescription", widget: "string" }
+  - { label: "Status", name: "status", widget: "select", options: ["waiting", "working", "ready"] }

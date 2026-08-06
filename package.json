@@ -12,6 +12,8 @@
     "astro": "astro"
   },
   "dependencies": {
-    "astro": "^7.1.6"
+    "astro": "^7.1.6",
+    "astro-opening-hours": "file:./packages/astro-opening-hours",
+    "astro-progress-tracker": "file:./packages/astro-progress-tracker"
   }
 }

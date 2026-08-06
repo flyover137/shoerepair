@@ -1,0 +1,43 @@
+{
+  "name": "astro-progress-tracker",
+  "version": "1.0.0",
+  "description": "A standalone, highly customizable, and domain-neutral customer progress and ticket tracker dashboard component for Astro.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./TicketTracker.astro": "./src/components/TicketTracker.astro"
+  },
+  "files": [
+    "dist",
+    "src",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "astro",
+    "progress-tracker",
+    "ticket-tracker",
+    "customer-orders",
+    "repair-tracker",
+    "widget"
+  ],
+  "author": "Antigravity",
+  "license": "MIT",
+  "peerDependencies": {
+    "astro": "^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0"
+  },
+  "dependencies": {
+    "zod": "^3.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

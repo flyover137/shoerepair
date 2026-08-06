@@ -2,6 +2,6 @@
   "ticketNumber": "1002",
   "customerName": "Jane Smith",
   "ticketDate": "2026-07-29",
-  "shoeDescription": "Suede Loafers cleaning",
-  "status": "waiting"
+  "status": "waiting",
+  "itemDescription": "Suede Loafers cleaning"
 }

@@ -1,0 +1,585 @@
+---
+import type { Ticket, StatusConfigMap } from '../lib/types.js';
+
+interface Props {
+  tickets: Ticket[];
+  statusConfigs?: StatusConfigMap;
+  class?: string;
+  classes?: {
+    container?: string;
+    searchBar?: string;
+    input?: string;
+    clearButton?: string;
+    infoStrip?: string;
+    table?: string;
+    cardGrid?: string;
+    card?: string;
+    badge?: string;
+  };
+  labels?: {
+    searchPlaceholder?: string;
+    ticketNumHeader?: string;
+    customerHeader?: string;
+    dateHeader?: string;
+    descriptionHeader?: string;
+    statusHeader?: string;
+    noResultsText?: string;
+  };
+}
+
+const {
+  tickets = [],
+  statusConfigs = {},
+  class: className = '',
+  classes = {},
+  labels = {}
+} = Astro.props;
+
+// Formatting helper for privacy (e.g. John Doe -> John D.)
+function formatName(fullName: string) {
+  if (!fullName) return '';
+  const parts = fullName.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0];
+  const firstName = parts[0];
+  const lastInitial = parts[parts.length - 1][0].toUpperCase();
+  return `${firstName} ${lastInitial}.`;
+}
+
+// Default labels
+const searchPlaceholder = labels.searchPlaceholder || "Search by ticket #, customer name, description, or status...";
+const ticketNumHeader = labels.ticketNumHeader || "Ticket #";
+const customerHeader = labels.customerHeader || "Customer";
+const dateHeader = labels.dateHeader || "Date Received";
+const descriptionHeader = labels.descriptionHeader || "Description";
+const statusHeader = labels.statusHeader || "Status";
+const noResultsText = labels.noResultsText || "No tickets found matching that query.";
+
+// Default fallback configs for standard statuses
+const fallbackConfigs: StatusConfigMap = {
+  waiting: { label: "Waiting" },
+  working: { label: "Working" },
+  ready: { label: "Ready" }
+};
+
+// Merge user configs with fallbacks
+const resolvedStatusConfigs = { ...fallbackConfigs, ...statusConfigs };
+---
+
+<div class={`pt-container ${className} ${classes.container || ''}`} data-progress-tracker-root>
+  <!-- Search Bar -->
+  <div class={`pt-search-bar-container ${classes.searchBar || ''}`}>
+    <div class="pt-search-wrapper">
+      <svg class="pt-search-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input 
+        type="text" 
+        class={`pt-search-input ${classes.input || ''}`}
+        data-pt-search-input
+        placeholder={searchPlaceholder}
+        aria-label="Search tickets"
+        autocomplete="off"
+      />
+      <button class={`pt-clear-search-btn ${classes.clearButton || ''}`} data-pt-clear-search type="button" aria-label="Clear search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Info Strip -->
+  <div class={`pt-info-strip ${classes.infoStrip || ''}`}>
+    <span data-pt-summary-text>Showing {tickets.length} of {tickets.length} tickets</span>
+    <span data-pt-last-updated>Last Updated: Just Now</span>
+  </div>
+
+  <!-- Table Container (Desktop view) -->
+  <div class="pt-table-container">
+    <table class={`pt-table ${classes.table || ''}`}>
+      <thead>
+        <tr>
+          <th>{ticketNumHeader}</th>
+          <th>{customerHeader}</th>
+          <th>{dateHeader}</th>
+          <th>{descriptionHeader}</th>
+          <th>{statusHeader}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {tickets.map(ticket => {
+          const detail = resolvedStatusConfigs[ticket.status] || { label: ticket.status };
+          return (
+            <tr data-ticket-row data-ticket-number={ticket.ticketNumber}>
+              <td class="pt-ticket-num">#{ticket.ticketNumber}</td>
+              <td class="pt-customer-name">{formatName(ticket.customerName)}</td>
+              <td class="pt-ticket-date">{ticket.ticketDate}</td>
+              <td class="pt-item-desc">{ticket.itemDescription}</td>
+              <td>
+                <span 
+                  class={`pt-badge pt-badge-${ticket.status} ${classes.badge || ''}`}
+                  style={{
+                    backgroundColor: detail.bgColor,
+                    color: detail.textColor
+                  }}
+                >
+                  {detail.label}
+                </span>
+              </td>
+            </tr>
+          );
+        })}
+        <tr data-pt-no-results class="pt-no-results-row">
+          <td colspan="5">
+            <div class="pt-no-results-box">
+              <svg class="pt-no-results-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+              <p>{noResultsText}</p>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Cards Container (Mobile view) -->
+  <div class={`pt-cards-container ${classes.cardGrid || ''}`}>
+    {tickets.map(ticket => {
+      const detail = resolvedStatusConfigs[ticket.status] || { label: ticket.status };
+      return (
+        <div 
+          class={`pt-ticket-card ${classes.card || ''}`}
+          data-ticket-card 
+          data-ticket-number={ticket.ticketNumber}
+        >
+          <div class="pt-card-header-row">
+            <span class="pt-ticket-num">#{ticket.ticketNumber}</span>
+            <span 
+              class={`pt-badge pt-badge-${ticket.status} ${classes.badge || ''}`}
+              style={{
+                backgroundColor: detail.bgColor,
+                color: detail.textColor
+              }}
+            >
+              {detail.label}
+            </span>
+          </div>
+          <div class="pt-card-body-row">
+            <div>
+              <div class="pt-card-label">{customerHeader}</div>
+              <div class="pt-customer-name">{formatName(ticket.customerName)}</div>
+            </div>
+            <div style="margin-top: 0.5rem;">
+              <div class="pt-card-label">{descriptionHeader}</div>
+              <div class="pt-item-desc">{ticket.itemDescription}</div>
+            </div>
+            <div style="margin-top: 0.5rem;">
+              <div class="pt-card-label">{dateHeader}</div>
+              <div class="pt-ticket-date">{ticket.ticketDate}</div>
+            </div>
+          </div>
+        </div>
+      );
+    })}
+    <div data-pt-no-results-mobile class="pt-no-results-mobile-box">
+      <div class="pt-no-results-box">
+        <svg class="pt-no-results-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <p>{noResultsText}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .pt-container {
+    --color-text: var(--pt-color-text, #0f172a);
+    --color-text-muted: var(--pt-color-text-muted, #64748b);
+    --card-bg: var(--pt-card-bg, #ffffff);
+    --border-color: var(--pt-border-color, #e2e8f0);
+    --shadow-sm: var(--pt-shadow-sm, 0 1px 2px 0 rgba(0, 0, 0, 0.05));
+    --shadow-md: var(--pt-shadow-md, 0 4px 6px -1px rgba(0, 0, 0, 0.1));
+    
+    --badge-waiting-bg: var(--pt-badge-waiting-bg, #fef3c7);
+    --badge-waiting-text: var(--pt-badge-waiting-text, #d97706);
+    --badge-working-bg: var(--pt-badge-working-bg, #dbeafe);
+    --badge-working-text: var(--pt-badge-working-text, #2563eb);
+    --badge-ready-bg: var(--pt-badge-ready-bg, #d1fae5);
+    --badge-ready-text: var(--pt-badge-ready-text, #059669);
+
+    font-family: var(--pt-font-sans, system-ui, sans-serif);
+    color: var(--color-text);
+    width: 100%;
+  }
+
+  .pt-search-bar-container {
+    width: 100%;
+    margin-bottom: 1.5rem;
+  }
+
+  .pt-search-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+  }
+
+  .pt-search-icon-svg {
+    position: absolute;
+    left: 1.25rem;
+    width: 1.25rem;
+    height: 1.25rem;
+    color: var(--color-text-muted);
+    pointer-events: none;
+  }
+
+  .pt-search-input {
+    width: 100%;
+    padding: 0.85rem 3rem 0.85rem 3.25rem;
+    font-size: 0.95rem;
+    border: 1.5px solid var(--border-color);
+    border-radius: 12px;
+    background: var(--card-bg);
+    color: var(--color-text);
+    outline: none;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .pt-search-input:focus {
+    border-color: var(--pt-focus-color, #3b82f6);
+    box-shadow: 0 0 0 3px var(--pt-focus-glow, rgba(59, 130, 246, 0.15));
+  }
+
+  .pt-clear-search-btn {
+    position: absolute;
+    right: 1.25rem;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 1.25rem;
+    height: 1.25rem;
+    padding: 0;
+    background: none;
+    border: none;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    border-radius: 50%;
+    transition: color 0.15s ease;
+  }
+
+  .pt-clear-search-btn:hover {
+    color: var(--color-text);
+  }
+
+  .pt-clear-search-btn svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .pt-info-strip {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-muted);
+    margin-bottom: 1.25rem;
+    padding: 0 0.5rem;
+  }
+
+  /* Table styles */
+  .pt-table-container {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: var(--shadow-sm);
+    background: var(--card-bg);
+  }
+
+  .pt-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 0.9375rem;
+  }
+
+  .pt-table th, 
+  .pt-table td {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .pt-table th {
+    background-color: var(--pt-header-bg, #f8fafc);
+    font-weight: 600;
+    color: var(--color-text-muted);
+    font-size: 0.8125rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .pt-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .pt-ticket-num {
+    font-family: monospace;
+    font-weight: 700;
+    font-size: 0.95rem;
+  }
+
+  .pt-customer-name {
+    font-weight: 600;
+  }
+
+  .pt-ticket-date {
+    color: var(--color-text-muted);
+  }
+
+  .pt-item-desc {
+    color: var(--color-text);
+  }
+
+  /* Status Badges */
+  .pt-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.65rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-radius: 9999px;
+  }
+
+  .pt-badge-waiting {
+    background-color: var(--badge-waiting-bg);
+    color: var(--badge-waiting-text);
+  }
+
+  .pt-badge-working {
+    background-color: var(--badge-working-bg);
+    color: var(--badge-working-text);
+  }
+
+  .pt-badge-ready {
+    background-color: var(--badge-ready-bg);
+    color: var(--badge-ready-text);
+  }
+
+  /* No Results */
+  .pt-no-results-row {
+    display: none;
+  }
+
+  .pt-no-results-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1.5rem;
+    text-align: center;
+    color: var(--color-text-muted);
+  }
+
+  .pt-no-results-icon {
+    width: 2.25rem;
+    height: 2.25rem;
+    margin-bottom: 0.75rem;
+    opacity: 0.6;
+  }
+
+  .pt-no-results-box p {
+    margin: 0;
+    font-weight: 500;
+  }
+
+  /* Mobile layout (Cards) */
+  .pt-cards-container {
+    display: none;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+  }
+
+  .pt-ticket-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.15rem;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .pt-ticket-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .pt-card-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .pt-card-body-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .pt-card-label {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-muted);
+    margin-bottom: 0.15rem;
+  }
+
+  .pt-no-results-mobile-box {
+    display: none;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .pt-table-container {
+      display: none;
+    }
+    .pt-cards-container {
+      display: flex;
+    }
+  }
+
+  /* Dark mode variables mapping */
+  @media (prefers-color-scheme: dark) {
+    .pt-container {
+      --pt-color-text: var(--pt-color-text-dark, #f8fafc);
+      --pt-color-text-muted: var(--pt-color-text-muted-dark, #94a3b8);
+      --pt-card-bg: var(--pt-card-bg-dark, #1e293b);
+      --pt-border-color: var(--pt-border-color-dark, #334155);
+      
+      --pt-badge-waiting-bg: var(--pt-badge-waiting-bg-dark, rgba(217, 119, 6, 0.15));
+      --pt-badge-waiting-text: var(--pt-badge-waiting-text-dark, #fbbf24);
+      --pt-badge-working-bg: var(--pt-badge-working-bg-dark, rgba(37, 99, 235, 0.15));
+      --pt-badge-working-text: var(--pt-badge-working-text-dark, #60a5fa);
+      --pt-badge-ready-bg: var(--pt-badge-ready-bg-dark, rgba(5, 150, 105, 0.15));
+      --pt-badge-ready-text: var(--pt-badge-ready-text-dark, #34d399);
+      
+      --pt-header-bg: var(--pt-header-bg-dark, #0f172a);
+    }
+  }
+</style>
+
+<script>
+  function initProgressTracker() {
+    const containers = document.querySelectorAll('[data-progress-tracker-root]');
+    
+    containers.forEach(container => {
+      const searchInput = container.querySelector('[data-pt-search-input]') as HTMLInputElement;
+      const clearSearchBtn = container.querySelector('[data-pt-clear-search]') as HTMLButtonElement;
+      
+      const rows = container.querySelectorAll('[data-ticket-row]');
+      const cards = container.querySelectorAll('[data-ticket-card]');
+      
+      const summaryText = container.querySelector('[data-pt-summary-text]') as HTMLSpanElement;
+      const noResultsRow = container.querySelector('[data-pt-no-results]') as HTMLTableRowElement;
+      const noResultsMobile = container.querySelector('[data-pt-no-results-mobile]') as HTMLDivElement;
+      
+      if (!searchInput) return;
+
+      // Pre-cache all text content relative to DOM elements on load
+      // Reduces keystroke handling complex DOM lookups from O(N) querySelectors to O(N) memory match scans.
+      const elementsToFilter = [
+        ...Array.from(rows).map(el => ({ el: el as HTMLElement, isCard: false })),
+        ...Array.from(cards).map(el => ({ el: el as HTMLElement, isCard: true }))
+      ].map(item => {
+        const ticketNumber = item.el.getAttribute('data-ticket-number') || '';
+        const customerName = item.el.querySelector('.pt-customer-name')?.textContent?.toLowerCase() || '';
+        const itemDescription = item.el.querySelector('.pt-item-desc')?.textContent?.toLowerCase() || '';
+        const statusBadge = item.el.querySelector('.pt-badge');
+        const statusText = statusBadge?.textContent?.toLowerCase() || '';
+        
+        // Combined searchable text
+        const searchText = `${ticketNumber} ${customerName} ${itemDescription} ${statusText}`;
+        
+        return {
+          element: item.el,
+          ticketNumber,
+          searchText,
+          isCard: item.isCard
+        };
+      });
+
+      function filterTickets() {
+        const query = searchInput.value.trim().toLowerCase();
+        const visibleTickets = new Set<string>();
+
+        // Toggle clear button visibility
+        if (clearSearchBtn) {
+          clearSearchBtn.style.display = query ? 'flex' : 'none';
+        }
+
+        // Perform instant in-memory matches with zero DOM queries
+        elementsToFilter.forEach(item => {
+          const matches = item.searchText.includes(query);
+          if (matches) {
+            item.element.style.display = '';
+            visibleTickets.add(item.ticketNumber);
+          } else {
+            item.element.style.display = 'none';
+          }
+        });
+
+        const visibleCount = visibleTickets.size;
+        const totalUniqueCount = new Set(elementsToFilter.map(item => item.ticketNumber)).size;
+
+        // Update summary text and toggle empty banners
+        if (visibleCount === 0) {
+          if (noResultsRow) noResultsRow.style.display = 'table-row';
+          if (noResultsMobile) noResultsMobile.style.display = 'block';
+          if (summaryText) summaryText.textContent = `No tickets found matching "${searchInput.value}"`;
+        } else {
+          if (noResultsRow) noResultsRow.style.display = 'none';
+          if (noResultsMobile) noResultsMobile.style.display = 'none';
+          if (summaryText) summaryText.textContent = `Showing ${visibleCount} of ${totalUniqueCount} tickets`;
+        }
+      }
+
+      searchInput.addEventListener('input', filterTickets);
+      
+      clearSearchBtn?.addEventListener('click', () => {
+        searchInput.value = '';
+        searchInput.focus();
+        filterTickets();
+      });
+
+      // Run initial check
+      filterTickets();
+    });
+  }
+
+  // Run on page load
+  initProgressTracker();
+
+  // Run on page transitions swap
+  document.addEventListener('astro:after-swap', initProgressTracker);
+</script>

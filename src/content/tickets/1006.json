@@ -2,6 +2,6 @@
   "ticketNumber": "1006",
   "customerName": "William Wilson",
   "ticketDate": "2026-07-26",
-  "shoeDescription": "Chelsea Boots zipper repair",
-  "status": "working"
+  "status": "working",
+  "itemDescription": "Chelsea Boots zipper repair"
 }

@@ -2,6 +2,6 @@
   "ticketNumber": "1003",
   "customerName": "Robert Johnson",
   "ticketDate": "2026-07-27",
-  "shoeDescription": "Oxford Heel Replacement",
-  "status": "working"
+  "status": "working",
+  "itemDescription": "Oxford Heel Replacement"
 }

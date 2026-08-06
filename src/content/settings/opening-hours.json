@@ -1,0 +1,80 @@
+{
+  "openingHours": {
+    "timezone": "America/Chicago",
+    "regularHours": {
+      "monday": [
+        {
+          "opens": "13:00",
+          "closes": "18:00"
+        }
+      ],
+      "tuesday": [
+        {
+          "opens": "08:00",
+          "closes": "18:00"
+        }
+      ],
+      "wednesday": [
+        {
+          "opens": "10:00",
+          "closes": "18:00"
+        }
+      ],
+      "thursday": [
+        {
+          "opens": "08:00",
+          "closes": "10:30"
+        },
+        {
+          "opens": "11:30",
+          "closes": "18:05"
+        }
+      ],
+      "friday": [
+        {
+          "opens": "8:00",
+          "closes": "18:00"
+        }
+      ],
+      "saturday": [
+        {
+          "opens": "09:00",
+          "closes": "14:00"
+        }
+      ],
+      "sunday": [
+        {
+          "opens": "08:00",
+          "closes": "02:00"
+        }
+      ]
+    },
+    "specialDates": [
+      {
+        "date": "2026-11-26",
+        "label": "Thanksgiving Day",
+        "intervals": []
+      },
+      {
+        "date": "2026-12-25",
+        "label": "Christmas Day",
+        "intervals": []
+      },
+      {
+        "date": "2026-12-24",
+        "label": "Christmas Eve",
+        "intervals": [
+          {
+            "opens": "08:00",
+            "closes": "12:00"
+          }
+        ]
+      },
+      {
+        "date": "2026-12-26",
+        "label": "Boxing Day",
+        "intervals": []
+      }
+    ]
+  }
+}

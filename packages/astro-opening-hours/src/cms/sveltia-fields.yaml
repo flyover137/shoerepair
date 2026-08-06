@@ -1,0 +1,77 @@
+# astro-opening-hours: Sveltia / Decap CMS Fields Configuration Template
+# Copy and paste this under your settings file fields configuration:
+
+- name: "openingHours"
+  label: "Opening Hours Configuration"
+  widget: "object"
+  fields:
+    - { label: "Timezone", name: "timezone", widget: "string", default: "America/New_York", hint: "IANA Timezone string, e.g. America/New_York" }
+    - name: "regularHours"
+      label: "Regular Hours"
+      widget: "object"
+      fields:
+        - name: "monday"
+          label: "Monday"
+          widget: "list"
+          summary: "{{fields.opens}} - {{fields.closes}}"
+          fields:
+            - { label: "Opens", name: "opens", widget: "string", default: "08:00", hint: "Format: HH:MM (24-hour, e.g. 08:00 or 13:30)", pattern: ['^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$', 'Must be in 24-hour format (e.g. 08:00 or 17:00)'] }
+            - { label: "Closes", name: "closes", widget: "string", default: "18:00", hint: "Format: HH:MM (24-hour, e.g. 18:00 or 02:00)", pattern: ['^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$', 'Must be in 24-hour format (e.g. 18:00 or 02:00)'] }
+        - name: "tuesday"
+          label: "Tuesday"
+          widget: "list"
+          summary: "{{fields.opens}} - {{fields.closes}}"
+          fields:
+            - { label: "Opens", name: "opens", widget: "string", default: "08:00", hint: "Format: HH:MM (24-hour, e.g. 08:00 or 13:30)", pattern: ['^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$', 'Must be in 24-hour format (e.g. 08:00 or 17:00)'] }
+            - { label: "Closes", name: "closes", widget: "string", default: "18:00", hint: "Format: HH:MM (24-hour, e.g. 18:00 or 02:00)", pattern: ['^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$', 'Must be in 24-hour format (e.g. 18:00 or 02:00)'] }
+        - name: "wednesday"
+          label: "Wednesday"
+          widget: "list"
+          summary: "{{fields.opens}} - {{fields.closes}}"
+          fields:
+            - { label: "Opens", name: "opens", widget: "string", default: "08:00", hint: "Format: HH:MM (24-hour, e.g. 08:00 or 13:30)", pattern: ['^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$', 'Must be in 24-hour format (e.g. 08:00 or 17:00)'] }
+            - { label: "Closes", name: "closes", widget: "string", default: "18:00", hint: "Format: HH:MM (24-hour, e.g. 18:00 or 02:00)", pattern: ['^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$', 'Must be in 24-hour format (e.g. 18:00 or 02:00)'] }
+        - name: "thursday"
+          label: "Thursday"
+          widget: "list"
+          summary: "{{fields.opens}} - {{fields.closes}}"
+          fields:
+            - { label: "Opens", name: "opens", widget: "string", default: "08:00", hint: "Format: HH:MM (24-hour, e.g. 08:00 or 13:30)", pattern: ['^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$', 'Must be in 24-hour format (e.g. 08:00 or 17:00)'] }
+            - { label: "Closes", name: "closes", widget: "string", default: "18:00", hint: "Format: HH:MM (24-hour, e.g. 18:00 or 02:00)", pattern: ['^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$', 'Must be in 24-hour format (e.g. 18:00 or 02:00)'] }
+        - name: "friday"
+          label: "Friday"
+          widget: "list"
+          summary: "{{fields.opens}} - {{fields.closes}}"
+          fields:
+            - { label: "Opens", name: "opens", widget: "string", default: "08:00", hint: "Format: HH:MM (24-hour, e.g. 08:00 or 13:30)", pattern: ['^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$', 'Must be in 24-hour format (e.g. 08:00 or 17:00)'] }
+            - { label: "Closes", name: "closes", widget: "string", default: "18:00", hint: "Format: HH:MM (24-hour, e.g. 18:00 or 02:00)", pattern: ['^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$', 'Must be in 24-hour format (e.g. 18:00 or 02:00)'] }
+        - name: "saturday"
+          label: "Saturday"
+          widget: "list"
+          summary: "{{fields.opens}} - {{fields.closes}}"
+          fields:
+            - { label: "Opens", name: "opens", widget: "string", default: "09:00", hint: "Format: HH:MM (24-hour, e.g. 09:00 or 13:30)", pattern: ['^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$', 'Must be in 24-hour format (e.g. 08:00 or 17:00)'] }
+            - { label: "Closes", name: "closes", widget: "string", default: "14:00", hint: "Format: HH:MM (24-hour, e.g. 14:00 or 02:00)", pattern: ['^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$', 'Must be in 24-hour format (e.g. 18:00 or 02:00)'] }
+        - name: "sunday"
+          label: "Sunday"
+          widget: "list"
+          summary: "{{fields.opens}} - {{fields.closes}}"
+          fields:
+            - { label: "Opens", name: "opens", widget: "string", default: "08:00", hint: "Format: HH:MM (24-hour, e.g. 08:00 or 13:30)", pattern: ['^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$', 'Must be in 24-hour format (e.g. 08:00 or 17:00)'] }
+            - { label: "Closes", name: "closes", widget: "string", default: "18:00", hint: "Format: HH:MM (24-hour, e.g. 18:00 or 02:00)", pattern: ['^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$', 'Must be in 24-hour format (e.g. 18:00 or 02:00)'] }
+    - name: "specialDates"
+      label: "Special Dates & Holiday Hours"
+      widget: "list"
+      required: false
+      summary: "{{fields.date}}: {{fields.label}}"
+      fields:
+        - { label: "Date", name: "date", widget: "string", hint: "Format: YYYY-MM-DD" }
+        - { label: "Label / Holiday Name", name: "label", widget: "string", required: false }
+        - name: "intervals"
+          label: "Custom Hours (Empty for Closed)"
+          widget: "list"
+          required: false
+          summary: "{{fields.opens}} - {{fields.closes}}"
+          fields:
+            - { label: "Opens", name: "opens", widget: "string", hint: "Format: HH:MM (24-hour, e.g. 08:00)", pattern: ['^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$', 'Must be in 24-hour format (e.g. 08:00 or 17:00)'] }
+            - { label: "Closes", name: "closes", widget: "string", hint: "Format: HH:MM (24-hour, e.g. 18:00)", pattern: ['^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$', 'Must be in 24-hour format (e.g. 18:00 or 02:00)'] }

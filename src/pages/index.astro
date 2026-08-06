@@ -1,5 +1,7 @@
 ---
 import { getCollection, getEntry } from 'astro:content';
+import OpeningHours from 'astro-opening-hours/OpeningHours.astro';
+import TicketTracker from 'astro-progress-tracker/TicketTracker.astro';
 
 const ticketEntries = await getCollection('tickets');
 const tickets = ticketEntries.map(entry => entry.data);
@@ -17,6 +19,9 @@ const seo = seoEntry ? seoEntry.data : {
   seoTitle: "Main Street Shoe Repair - Customer Repair Tracker",
   seoDescription: "Track your shoe repairs at Main Street Shoe Repair using our minimalist, real-time repair tracker."
 };
+
+const openingHoursEntry = await getEntry('openingHoursSettings', 'openingHours');
+const openingHours = openingHoursEntry ? openingHoursEntry.data : null;
 
 function formatName(fullName: string) {
   if (!fullName) return '';
@@ -141,21 +146,21 @@ function formatName(fullName: string) {
 			}
 
 			.logo-container {
-				background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%);
+				background: #3b6bb8;
 				color: white;
-				width: 3.25rem;
-				height: 3.25rem;
+				width: 3rem;
+				height: 3rem;
 				border-radius: 0.75rem;
 				display: flex;
 				align-items: center;
 				justify-content: center;
-				box-shadow: var(--shadow-md);
+				box-shadow: var(--shadow-sm);
 				flex-shrink: 0;
 			}
 
 			.logo-icon {
-				width: 1.75rem;
-				height: 1.75rem;
+				width: 1.5rem;
+				height: 1.5rem;
 			}
 
 			.header-text {
@@ -165,19 +170,16 @@ function formatName(fullName: string) {
 			}
 
 			h1 {
-				font-size: 1.75rem;
+				font-size: 1.35rem;
 				font-weight: 700;
-				letter-spacing: -0.025em;
+				color: #1e293b;
 				margin: 0;
 				line-height: 1.2;
-				background: linear-gradient(135deg, var(--text-color) 40%, var(--text-muted) 100%);
-				-webkit-background-clip: text;
-				-webkit-text-fill-color: transparent;
 			}
 
 			.subtitle {
-				font-size: 0.95rem;
-				color: var(--text-muted);
+				font-size: 0.875rem;
+				color: #475569;
 				font-weight: 500;
 				margin-top: 0.15rem;
 			}
@@ -486,6 +488,19 @@ function formatName(fullName: string) {
 				transform: rotate(-10deg) scale(1.05);
 				transition: transform 0.2s ease;
 			}
+
+			.header-right {
+				flex-shrink: 0;
+			}
+
+			@media (prefers-color-scheme: dark) {
+				h1 {
+					color: #f8fafc;
+				}
+				.subtitle {
+					color: #94a3b8;
+				}
+			}
 		</style>
 	</head>
 	<body>
@@ -493,10 +508,10 @@ function formatName(fullName: string) {
 			<header>
 				<div class="header-left">
 					<div class="logo-container">
-						<!-- Clean modern shoe logo -->
+						<!-- Clean modern arrow logo -->
 						<svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-							<path d="M4 16v-2a4 4 0 0 1 4-4h4l5-6h3v4l-3 4v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z" />
-							<path d="M14 10v10" />
+							<line x1="5" y1="12" x2="19" y2="12"></line>
+							<polyline points="12 5 19 12 12 19"></polyline>
 						</svg>
 					</div>
 					<div class="header-text">
@@ -504,183 +519,25 @@ function formatName(fullName: string) {
 						<p class="subtitle">{general.subtitle}</p>
 					</div>
 				</div>
+				<div class="header-right">
+					{openingHours && (
+						<OpeningHours 
+							config={openingHours} 
+							businessName={general.brandName} 
+							dayFormat="long" 
+							timeFormat="12h" 
+						/>
+					)}
+				</div>
 			</header>
 
 			<section class="card">
-				<div class="search-bar-container">
-					<div class="search-wrapper">
-						<svg class="search-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-							<circle cx="11" cy="11" r="8"></circle>
-							<line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-						</svg>
-						<input 
-							type="text" 
-							id="ticket-search" 
-							class="search-input" 
-							placeholder="Search by ticket #, customer name, shoe description, or status..." 
-							aria-label="Search repair tickets" 
-							autocomplete="off"
-						/>
-						<button id="clear-search-btn" class="clear-search-btn" type="button" aria-label="Clear search">
-							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-								<line x1="18" y1="6" x2="6" y2="18"></line>
-								<line x1="6" y1="6" x2="18" y2="18"></line>
-							</svg>
-						</button>
-					</div>
-				</div>
-
-				<div class="info-strip">
-					<span id="status-summary">Showing {tickets.length} of {tickets.length} tickets</span>
-					<span>Last Updated: Just Now</span>
-				</div>
-
-				<div class="table-container">
-					<table>
-						<thead>
-							<tr>
-								<th>Ticket #</th>
-								<th>Customer</th>
-								<th>Date Received</th>
-								<th>Shoe Description</th>
-								<th>Status</th>
-							</tr>
-						</thead>
-						<tbody>
-							{tickets.map(ticket => (
-								<tr data-ticket-number={ticket.ticketNumber}>
-									<td class="ticket-num">#{ticket.ticketNumber}</td>
-									<td class="customer-name">{formatName(ticket.customerName)}</td>
-									<td class="ticket-date">{ticket.ticketDate}</td>
-									<td class="shoe-desc">{ticket.shoeDescription}</td>
-									<td>
-										<span class={`badge badge-${ticket.status}`}>
-											{ticket.status}
-										</span>
-									</td>
-								</tr>
-							))}
-							<tr id="no-results">
-								<td colspan="5">
-									<div class="no-results-box">
-										<svg class="no-results-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-											<circle cx="12" cy="12" r="10"></circle>
-											<line x1="12" y1="8" x2="12" y2="12"></line>
-											<line x1="12" y1="16" x2="12.01" y2="16"></line>
-										</svg>
-										<p>No tickets found matching that number.</p>
-									</div>
-								</td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
-
-				<div class="cards-container">
-					{tickets.map(ticket => (
-						<div class="ticket-card" data-ticket-number={ticket.ticketNumber}>
-							<div class="card-header-row">
-								<span class="ticket-num">#{ticket.ticketNumber}</span>
-								<span class={`badge badge-${ticket.status}`}>{ticket.status}</span>
-							</div>
-							<div class="card-body-row">
-								<div>
-									<div class="card-label">Customer</div>
-									<div class="customer-name">{formatName(ticket.customerName)}</div>
-								</div>
-								<div style="margin-top: 0.5rem;">
-									<div class="card-label">Description</div>
-									<div class="shoe-desc">{ticket.shoeDescription}</div>
-								</div>
-								<div style="margin-top: 0.5rem;">
-									<div class="card-label">Received Date</div>
-									<div class="ticket-date">{ticket.ticketDate}</div>
-								</div>
-							</div>
-						</div>
-					))}
-					<div id="no-results-mobile">
-						<div class="no-results-box">
-							<svg class="no-results-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-								<circle cx="12" cy="12" r="10"></circle>
-								<line x1="12" y1="8" x2="12" y2="12"></line>
-								<line x1="12" y1="16" x2="12.01" y2="16"></line>
-							</svg>
-							<p>No tickets found matching that number.</p>
-						</div>
-					</div>
-				</div>
+				<TicketTracker tickets={tickets} />
 			</section>
 
 			<footer>
 				<p>{general.footerText}</p>
 			</footer>
 		</main>
-
-		<script>
-			// Client-side instant filtering logic
-			const searchInput = document.getElementById('ticket-search') as HTMLInputElement;
-			const clearSearchBtn = document.getElementById('clear-search-btn') as HTMLButtonElement;
-			const items = document.querySelectorAll('[data-ticket-number]') as NodeListOf<HTMLElement>;
-			const summaryText = document.getElementById('status-summary') as HTMLParagraphElement;
-			const noResultsRow = document.getElementById('no-results') as HTMLTableRowElement;
-			const noResultsMobile = document.getElementById('no-results-mobile') as HTMLDivElement;
-
-			function filterTickets() {
-				const query = searchInput.value.trim().toLowerCase();
-				const visibleTickets = new Set<string>();
-
-				// Toggle custom clear button
-				if (clearSearchBtn) {
-					clearSearchBtn.style.display = query ? 'flex' : 'none';
-				}
-
-				items.forEach(item => {
-					const ticketNumber = item.getAttribute('data-ticket-number') || '';
-					const customerName = item.querySelector('.customer-name')?.textContent || '';
-					const shoeDescription = item.querySelector('.shoe-desc')?.textContent || '';
-					
-					// Get status text (from badge element)
-					const statusBadge = item.querySelector('.badge');
-					const statusText = statusBadge?.textContent || '';
-
-					const matches = 
-						ticketNumber.toLowerCase().includes(query) ||
-						customerName.toLowerCase().includes(query) ||
-						shoeDescription.toLowerCase().includes(query) ||
-						statusText.toLowerCase().includes(query);
-
-					if (matches) {
-						item.style.display = '';
-						visibleTickets.add(ticketNumber);
-					} else {
-						item.style.display = 'none';
-					}
-				});
-
-				const visibleCount = visibleTickets.size;
-				const totalUniqueCount = new Set(Array.from(items).map(item => item.getAttribute('data-ticket-number'))).size;
-
-				if (visibleCount === 0) {
-					if (noResultsRow) noResultsRow.style.display = 'table-row';
-					if (noResultsMobile) noResultsMobile.style.display = 'block';
-					if (summaryText) summaryText.textContent = `No tickets found matching "${searchInput.value}"`;
-				} else {
-					if (noResultsRow) noResultsRow.style.display = 'none';
-					if (noResultsMobile) noResultsMobile.style.display = 'none';
-					if (summaryText) summaryText.textContent = `Showing ${visibleCount} of ${totalUniqueCount} tickets`;
-				}
-			}
-
-			searchInput?.addEventListener('input', filterTickets);
-
-			clearSearchBtn?.addEventListener('click', () => {
-				if (searchInput) {
-					searchInput.value = '';
-					searchInput.focus();
-					filterTickets();
-				}
-			});
-		</script>
 	</body>
 </html>

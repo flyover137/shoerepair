@@ -2,6 +2,6 @@
   "ticketNumber": "1008",
   "customerName": "David Miller",
   "ticketDate": "2026-07-24",
-  "shoeDescription": "Running Shoes patch",
-  "status": "ready"
+  "status": "ready",
+  "itemDescription": "Running Shoes patch"
 }

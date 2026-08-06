@@ -1,0 +1,501 @@
+---
+import type { OpeningHoursConfig, DayOfWeek } from '../lib/types.js';
+import { getHeaderStatusDetails, formatHours, getLocalDateTime } from '../lib/utils.js';
+import { generateOpeningHoursSchema } from '../lib/seo.js';
+
+interface Props {
+  config: OpeningHoursConfig;
+  dayFormat?: 'short' | 'long';
+  timeFormat?: '12h' | '24h';
+  class?: string;
+  classes?: {
+    container?: string;
+    pill?: string;
+    dropdown?: string;
+    dropdownCard?: string;
+    dayRow?: string;
+    dayLabel?: string;
+    intervals?: string;
+  };
+  renderJsonLd?: boolean;
+  businessType?: string;
+  businessName?: string;
+}
+
+const {
+  config,
+  dayFormat = 'long',
+  timeFormat = '12h',
+  class: className = '',
+  classes = {},
+  renderJsonLd = true,
+  businessType = 'LocalBusiness',
+  businessName
+} = Astro.props;
+
+const shortDays: Record<DayOfWeek, string> = {
+  monday: 'Mon',
+  tuesday: 'Tue',
+  wednesday: 'Wed',
+  thursday: 'Thu',
+  friday: 'Fri',
+  saturday: 'Sat',
+  sunday: 'Sun'
+};
+
+const longDays: Record<DayOfWeek, string> = {
+  monday: 'Monday',
+  tuesday: 'Tuesday',
+  wednesday: 'Wednesday',
+  thursday: 'Thursday',
+  friday: 'Friday',
+  saturday: 'Saturday',
+  sunday: 'Sunday'
+};
+
+const daysOrder: DayOfWeek[] = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+
+// Compute status details
+const initialStatus = getHeaderStatusDetails(config, new Date(), timeFormat);
+const localTimeInfo = getLocalDateTime(new Date(), config.timezone);
+const todayStr = localTimeInfo.dateStr;
+const currentDayOfWeek = localTimeInfo.dayOfWeek;
+
+// Filter future holiday overrides
+const upcomingSpecialDates = config.specialDates
+  ? config.specialDates
+      .filter(item => item.date >= todayStr)
+      .sort((a, b) => a.date.localeCompare(b.date))
+  : [];
+
+// Generate Schema.org JSON-LD structured data
+const jsonLd = renderJsonLd ? generateOpeningHoursSchema(config, businessName, businessType) : null;
+---
+
+{jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+
+<div 
+  class={`oh-header-widget ${className} ${classes.container || ''}`}
+  data-opening-hours-root
+  data-config={JSON.stringify(config)}
+  data-time-format={timeFormat}
+>
+  <!-- Status Badge Pill -->
+  <div 
+    class={`oh-status-pill ${initialStatus.isOpen ? 'is-open' : 'is-closed'} ${classes.pill || ''}`}
+    data-status-pill
+  >
+    <span class="oh-status-dot"></span>
+    <span class="oh-status-text">
+      <strong class="oh-status-state" data-status-state>{initialStatus.stateLabel}</strong>
+      <span class="oh-status-detail" data-status-detail>{initialStatus.detailLabel}</span>
+    </span>
+  </div>
+
+  <!-- Weekly Hours Accordion / Dropdown -->
+  <details class={`oh-dropdown ${classes.dropdown || ''}`}>
+    <summary class="oh-dropdown-summary">
+      <span>Weekly Hours</span>
+      <svg class="oh-dropdown-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="6 9 12 15 18 9"></polyline>
+      </svg>
+    </summary>
+    <div class={`oh-dropdown-card ${classes.dropdownCard || ''}`}>
+      <div class="oh-schedule-list">
+        {daysOrder.map((day) => {
+          const isToday = day === currentDayOfWeek;
+          const intervals = config.regularHours[day] || [];
+          const isClosed = intervals.length === 0;
+          
+          return (
+            <div 
+              class={`oh-day-row ${isToday ? 'is-today' : ''} ${classes.dayRow || ''}`}
+              data-day={day}
+            >
+              <span class={`oh-day-label ${classes.dayLabel || ''}`}>
+                {dayFormat === 'short' ? shortDays[day] : longDays[day]}
+                {isToday && <span class="oh-today-tag">Today</span>}
+              </span>
+              <span class={`oh-day-intervals ${isClosed ? 'is-closed-text' : ''} ${classes.intervals || ''}`}>
+                {formatHours(intervals, timeFormat)}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+
+      {upcomingSpecialDates.length > 0 && (
+        <div class="oh-special-dates">
+          <h4 class="oh-special-title">Holiday Hours</h4>
+          <div class="oh-special-list">
+            {upcomingSpecialDates.map((special) => {
+              const dateParts = special.date.split('-');
+              const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+              const mIdx = parseInt(dateParts[1], 10) - 1;
+              const formattedDate = `${monthNames[mIdx]} ${parseInt(dateParts[2], 10)}`;
+              
+              return (
+                <div class="oh-special-row">
+                  <div class="oh-special-meta">
+                    <span class="oh-special-date">{formattedDate}</span>
+                    {special.label && <span class="oh-special-label">{special.label}</span>}
+                  </div>
+                  <span class={`oh-special-hours ${special.intervals.length === 0 ? 'is-closed-text' : ''}`}>
+                    {formatHours(special.intervals, timeFormat)}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  </details>
+</div>
+
+<style>
+  .oh-header-widget {
+    /* Custom Styling properties with fallback defaults */
+    --color-success: var(--oh-color-success, #10b981);
+    --color-success-bg: var(--oh-color-success-bg, #ecfdf5);
+    --color-success-border: var(--oh-color-success-border, rgba(16, 185, 129, 0.2));
+    --color-danger: var(--oh-color-danger, #ef4444);
+    --color-danger-bg: var(--oh-color-danger-bg, #fef2f2);
+    --color-danger-border: var(--oh-color-danger-border, rgba(239, 68, 68, 0.2));
+    
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    position: relative;
+    font-family: var(--oh-font-sans, system-ui, sans-serif);
+    color: var(--oh-color-text, #0f172a);
+  }
+
+  .oh-status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0.85rem;
+    border-radius: 9999px;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    border: 1px solid transparent;
+    line-height: 1.2;
+    transition: all 0.3s ease;
+  }
+
+  .oh-status-pill.is-open {
+    background-color: var(--color-success-bg);
+    color: var(--oh-open-text, #047857);
+    border-color: var(--color-success-border);
+  }
+
+  .oh-status-pill.is-closed {
+    background-color: var(--color-danger-bg);
+    color: var(--oh-closed-text, #b91c1c);
+    border-color: var(--color-danger-border);
+  }
+
+  .oh-status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: currentColor;
+    display: inline-block;
+  }
+
+  .oh-status-pill.is-open .oh-status-dot {
+    animation: oh-pulse 2.2s infinite;
+  }
+
+  @keyframes oh-pulse {
+    0% { transform: scale(0.95); opacity: 0.6; }
+    50% { transform: scale(1.2); opacity: 1; }
+    100% { transform: scale(0.95); opacity: 0.6; }
+  }
+
+  .oh-status-text {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+  }
+
+  .oh-status-state {
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+
+  .oh-status-detail {
+    opacity: 0.9;
+  }
+
+  /* Dropdown styling */
+  .oh-dropdown {
+    position: relative;
+  }
+
+  .oh-dropdown-summary {
+    list-style: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--oh-color-text-muted, #64748b);
+    user-select: none;
+    transition: color 0.15s ease;
+  }
+
+  .oh-dropdown-summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .oh-dropdown-summary:hover {
+    color: var(--oh-color-text, #0f172a);
+  }
+
+  .oh-dropdown-chevron {
+    width: 0.875rem;
+    height: 0.875rem;
+    transition: transform 0.25s ease;
+    opacity: 0.75;
+  }
+
+  .oh-dropdown[open] .oh-dropdown-chevron {
+    transform: rotate(180deg);
+  }
+
+  .oh-dropdown-card {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 0.625rem);
+    background: var(--oh-card-bg, #ffffff);
+    border: 1px solid var(--oh-border-color, #e2e8f0);
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: var(--oh-shadow-lg, 0 10px 15px -3px rgba(0,0,0,0.1));
+    z-index: 100;
+    width: 290px;
+    box-sizing: border-box;
+    animation: oh-popover-in 0.2s ease-out;
+  }
+
+  @keyframes oh-popover-in {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .oh-schedule-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .oh-day-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.25rem 0.375rem;
+    border-radius: 6px;
+  }
+
+  .oh-day-row.is-today {
+    background-color: var(--color-success-bg);
+  }
+
+  .oh-day-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.8125rem;
+    color: var(--oh-color-text, #0f172a);
+  }
+
+  .oh-day-row.is-today .oh-day-label {
+    font-weight: 700;
+  }
+
+  .oh-today-tag {
+    font-size: 0.625rem;
+    background-color: var(--color-success);
+    color: var(--oh-card-bg, #ffffff);
+    padding: 0.05rem 0.25rem;
+    border-radius: 4px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .oh-day-intervals {
+    font-size: 0.8125rem;
+    color: var(--oh-color-text, #0f172a);
+    text-align: right;
+  }
+
+  .oh-day-row.is-today .oh-day-intervals {
+    font-weight: 700;
+  }
+
+  .oh-day-intervals.is-closed-text {
+    color: var(--oh-color-text-muted, #64748b);
+  }
+
+  .oh-special-dates {
+    margin-top: 0.85rem;
+    border-top: 1px solid var(--oh-border-color, #e2e8f0);
+    padding-top: 0.65rem;
+  }
+
+  .oh-special-title {
+    margin: 0 0 0.4rem 0;
+    font-size: 0.725rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--oh-color-text-muted, #64748b);
+  }
+
+  .oh-special-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .oh-special-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.125rem 0.25rem;
+    font-size: 0.75rem;
+  }
+
+  .oh-special-meta {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .oh-special-date {
+    font-weight: 600;
+  }
+
+  .oh-special-label {
+    font-size: 0.65rem;
+    color: var(--oh-color-text-muted, #64748b);
+  }
+
+  .oh-special-hours {
+    text-align: right;
+    font-weight: 600;
+  }
+
+  .oh-special-hours.is-closed-text {
+    color: var(--color-danger);
+  }
+
+  /* Dark mode variables mapping */
+  @media (prefers-color-scheme: dark) {
+    .oh-header-widget {
+      --color-success-bg: var(--oh-color-success-bg-dark, rgba(52, 211, 153, 0.12));
+      --color-success-border: var(--oh-color-success-border-dark, rgba(52, 211, 153, 0.3));
+      --color-danger-bg: var(--oh-color-danger-bg-dark, rgba(248, 113, 113, 0.12));
+      --color-danger-border: var(--oh-color-danger-border-dark, rgba(248, 113, 113, 0.3));
+      --oh-color-text: var(--oh-color-text-dark, #f8fafc);
+      --oh-color-text-muted: var(--oh-color-text-muted-dark, #94a3b8);
+      --oh-card-bg: var(--oh-card-bg-dark, #1e293b);
+      --oh-border-color: var(--oh-border-color-dark, #334155);
+    }
+
+    .oh-status-pill.is-open {
+      color: var(--oh-open-text-dark, #34d399);
+    }
+
+    .oh-status-pill.is-closed {
+      color: var(--oh-closed-text-dark, #f87171);
+    }
+    
+    .oh-today-tag {
+      background-color: var(--oh-open-text-dark, #34d399);
+      color: var(--oh-card-bg-dark, #0f172a);
+    }
+  }
+</style>
+
+<script>
+  import { getHeaderStatusDetails, getLocalDateTime } from '../lib/utils.js';
+
+  function initOpeningHours() {
+    const containers = document.querySelectorAll('[data-opening-hours-root]');
+    
+    containers.forEach(container => {
+      const configStr = container.getAttribute('data-config');
+      const timeFormat = (container.getAttribute('data-time-format') || '12h') as '12h' | '24h';
+      if (!configStr) return;
+      
+      try {
+        const config = JSON.parse(configStr);
+        
+        const updateStatus = () => {
+          const pill = container.querySelector('[data-status-pill]');
+          const stateText = container.querySelector('[data-status-state]');
+          const detailText = container.querySelector('[data-status-detail]');
+          const rowElements = container.querySelectorAll('.oh-day-row');
+          
+          if (!pill || !stateText || !detailText) return;
+          
+          const status = getHeaderStatusDetails(config, new Date(), timeFormat);
+          const localTimeInfo = getLocalDateTime(new Date(), config.timezone);
+          const currentDayOfWeek = localTimeInfo.dayOfWeek;
+          
+          // Update Pill Status Classes
+          pill.classList.remove('is-open', 'is-closed');
+          pill.classList.add(status.isOpen ? 'is-open' : 'is-closed');
+          
+          // Update Pill Labels
+          stateText.textContent = status.stateLabel;
+          detailText.textContent = status.detailLabel;
+          
+          // Update Schedule Table row highlights
+          rowElements.forEach(row => {
+            const day = row.getAttribute('data-day');
+            const isToday = day === currentDayOfWeek;
+            
+            if (isToday) {
+              if (!row.classList.contains('is-today')) {
+                row.classList.add('is-today');
+                let label = row.querySelector('.oh-day-label');
+                if (label && !label.querySelector('.oh-today-tag')) {
+                  const tag = document.createElement('span');
+                  tag.className = 'oh-today-tag';
+                  tag.textContent = 'Today';
+                  label.appendChild(tag);
+                }
+              }
+            } else {
+              row.classList.remove('is-today');
+              const tag = row.querySelector('.oh-today-tag');
+              if (tag) tag.remove();
+            }
+          });
+        };
+        
+        // Initial execution
+        updateStatus();
+        
+        // Poll status every 30 seconds
+        const intervalId = setInterval(updateStatus, 30000);
+        
+        // Cleanup interval on Astro transitions swap
+        document.addEventListener('astro:after-swap', () => clearInterval(intervalId), { once: true });
+      } catch (e) {
+        console.error('Failed to parse opening hours configuration in progressive script:', e);
+      }
+    });
+  }
+
+  // Setup on page load
+  initOpeningHours();
+  
+  // Setup on transitions swap
+  document.addEventListener('astro:after-swap', initOpeningHours);
+</script>

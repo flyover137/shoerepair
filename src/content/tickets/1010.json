@@ -2,6 +2,6 @@
   "ticketNumber": "1010",
   "customerName": "Linda Taylor",
   "ticketDate": "2026-08-01",
-  "shoeDescription": "Example Ticket",
-  "status": "waiting"
+  "status": "waiting",
+  "itemDescription": "Example Ticket"
 }
