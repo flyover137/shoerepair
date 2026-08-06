@@ -139,15 +139,6 @@ function formatName(fullName: string) {
 				width: 100%;
 			}
 
-			.hours-header-link {
-				transition: transform 0.15s ease, opacity 0.15s ease;
-			}
-
-			.hours-header-link:hover {
-				transform: translateY(-1px);
-				opacity: 0.9;
-			}
-
 			.header-left {
 				display: flex;
 				align-items: center;
@@ -530,15 +521,13 @@ function formatName(fullName: string) {
 				</div>
 				<div class="header-right">
 					{openingHours && (
-						<a href="/hours" class="hours-header-link" aria-label="View opening hours and location">
-							<OpeningHours 
-								config={openingHours} 
-								layout="pill"
-								businessName={general.brandName} 
-								dayFormat="long" 
-								timeFormat="12h" 
-							/>
-						</a>
+						<OpeningHours 
+							config={openingHours} 
+							layout="pill"
+							businessName={general.brandName} 
+							dayFormat="long" 
+							timeFormat="12h" 
+						/>
 					)}
 				</div>
 			</header>
