@@ -7,6 +7,7 @@ interface Props {
   config: OpeningHoursConfig;
   dayFormat?: 'short' | 'long';
   timeFormat?: '12h' | '24h';
+  layout?: 'pill' | 'dropdown' | 'full';
   class?: string;
   classes?: {
     container?: string;
@@ -26,6 +27,7 @@ const {
   config,
   dayFormat = 'long',
   timeFormat = '12h',
+  layout = 'dropdown',
   class: className = '',
   classes = {},
   renderJsonLd = true,
@@ -75,32 +77,90 @@ const jsonLd = renderJsonLd ? generateOpeningHoursSchema(config, businessName, b
 {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
 
 <div 
-  class={`oh-header-widget ${className} ${classes.container || ''}`}
+  class={`oh-header-widget layout-${layout} ${className} ${classes.container || ''}`}
   data-opening-hours-root
   data-config={JSON.stringify(config)}
   data-time-format={timeFormat}
 >
   <!-- Status Badge Pill -->
-  <div 
-    class={`oh-status-pill ${initialStatus.isOpen ? 'is-open' : 'is-closed'} ${classes.pill || ''}`}
-    data-status-pill
-  >
-    <span class="oh-status-dot"></span>
-    <span class="oh-status-text">
-      <strong class="oh-status-state" data-status-state>{initialStatus.stateLabel}</strong>
-      <span class="oh-status-detail" data-status-detail>{initialStatus.detailLabel}</span>
-    </span>
-  </div>
+  {(layout === 'pill' || layout === 'dropdown') && (
+    <div 
+      class={`oh-status-pill ${initialStatus.isOpen ? 'is-open' : 'is-closed'} ${classes.pill || ''}`}
+      data-status-pill
+    >
+      <span class="oh-status-dot"></span>
+      <span class="oh-status-text">
+        <strong class="oh-status-state" data-status-state>{initialStatus.stateLabel}</strong>
+        <span class="oh-status-detail" data-status-detail>{initialStatus.detailLabel}</span>
+      </span>
+    </div>
+  )}
 
   <!-- Weekly Hours Accordion / Dropdown -->
-  <details class={`oh-dropdown ${classes.dropdown || ''}`}>
-    <summary class="oh-dropdown-summary">
-      <span>Weekly Hours</span>
-      <svg class="oh-dropdown-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="6 9 12 15 18 9"></polyline>
-      </svg>
-    </summary>
-    <div class={`oh-dropdown-card ${classes.dropdownCard || ''}`}>
+  {layout === 'dropdown' && (
+    <details class={`oh-dropdown ${classes.dropdown || ''}`}>
+      <summary class="oh-dropdown-summary">
+        <span>Weekly Hours</span>
+        <svg class="oh-dropdown-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </summary>
+      <div class={`oh-dropdown-card ${classes.dropdownCard || ''}`}>
+        <div class="oh-schedule-list">
+          {daysOrder.map((day) => {
+            const isToday = day === currentDayOfWeek;
+            const intervals = config.regularHours[day] || [];
+            const isClosed = intervals.length === 0;
+            
+            return (
+              <div 
+                class={`oh-day-row ${isToday ? 'is-today' : ''} ${classes.dayRow || ''}`}
+                data-day={day}
+              >
+                <span class={`oh-day-label ${classes.dayLabel || ''}`}>
+                  {dayFormat === 'short' ? shortDays[day] : longDays[day]}
+                  {isToday && <span class="oh-today-tag">Today</span>}
+                </span>
+                <span class={`oh-day-intervals ${isClosed ? 'is-closed-text' : ''} ${classes.intervals || ''}`}>
+                  {formatHours(intervals, timeFormat)}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+
+        {upcomingSpecialDates.length > 0 && (
+          <div class="oh-special-dates">
+            <h4 class="oh-special-title">Holiday Hours</h4>
+            <div class="oh-special-list">
+              {upcomingSpecialDates.map((special) => {
+                const dateParts = special.date.split('-');
+                const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                const mIdx = parseInt(dateParts[1], 10) - 1;
+                const formattedDate = `${monthNames[mIdx]} ${parseInt(dateParts[2], 10)}`;
+                
+                return (
+                  <div class="oh-special-row">
+                    <div class="oh-special-meta">
+                      <span class="oh-special-date">{formattedDate}</span>
+                      {special.label && <span class="oh-special-label">{special.label}</span>}
+                    </div>
+                    <span class={`oh-special-hours ${special.intervals.length === 0 ? 'is-closed-text' : ''}`}>
+                      {formatHours(special.intervals, timeFormat)}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </div>
+    </details>
+  )}
+
+  <!-- Full Static Layout -->
+  {layout === 'full' && (
+    <div class={`oh-full-card ${classes.dropdownCard || ''}`}>
       <div class="oh-schedule-list">
         {daysOrder.map((day) => {
           const isToday = day === currentDayOfWeek;
@@ -150,7 +210,7 @@ const jsonLd = renderJsonLd ? generateOpeningHoursSchema(config, businessName, b
         </div>
       )}
     </div>
-  </details>
+  )}
 </div>
 
 <style>
@@ -391,6 +451,21 @@ const jsonLd = renderJsonLd ? generateOpeningHoursSchema(config, businessName, b
 
   .oh-special-hours.is-closed-text {
     color: var(--color-danger);
+  }
+
+  .oh-header-widget.layout-full {
+    display: block;
+    width: 100%;
+  }
+
+  .oh-full-card {
+    background: var(--oh-card-bg, #ffffff);
+    border: 1px solid var(--oh-border-color, #e2e8f0);
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: var(--oh-shadow-sm, 0 1px 2px 0 rgba(0,0,0,0.05));
+    width: 100%;
+    box-sizing: border-box;
   }
 
   /* Dark mode variables mapping */

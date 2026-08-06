@@ -1,0 +1,273 @@
+---
+import { getEntry } from 'astro:content';
+import OpeningHours from 'astro-opening-hours/OpeningHours.astro';
+
+// Fetch settings from content collections
+const generalEntry = await getEntry('generalSettings', 'general');
+const general = generalEntry ? generalEntry.data : {
+  brandName: "Main Street Shoe Repair",
+  subtitle: "Customer Repair Tracker",
+  footerText: "© 2026 Main Street Shoe Repair. All rights reserved."
+};
+
+const seoEntry = await getEntry('seoSettings', 'seo');
+const seo = seoEntry ? seoEntry.data : {
+  seoTitle: "Main Street Shoe Repair - Opening Hours",
+  seoDescription: "Find weekly business hours, holiday status, and contact information for Main Street Shoe Repair."
+};
+
+const openingHoursEntry = await getEntry('openingHoursSettings', 'openingHours');
+const openingHours = openingHoursEntry ? openingHoursEntry.data : null;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>{seo.seoTitle}</title>
+		<meta name="description" content={seo.seoDescription} />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+		<style>
+			:root {
+				--bg-color: #f8fafc;
+				--card-bg: #ffffff;
+				--text-color: #0f172a;
+				--text-muted: #64748b;
+				--border-color: #e2e8f0;
+				--shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+				--shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+				--font-sans: 'Inter', sans-serif;
+			}
+
+			@media (prefers-color-scheme: dark) {
+				:root {
+					--bg-color: #0f172a;
+					--card-bg: #1e293b;
+					--text-color: #f8fafc;
+					--text-muted: #94a3b8;
+					--border-color: #334155;
+				}
+			}
+
+			* {
+				box-sizing: border-box;
+				margin: 0;
+				padding: 0;
+			}
+
+			body {
+				background-color: var(--bg-color);
+				color: var(--text-color);
+				font-family: var(--font-sans);
+				line-height: 1.5;
+				min-height: 100vh;
+				padding: 2rem 1rem;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				transition: background-color 0.3s ease, color 0.3s ease;
+			}
+
+			main {
+				width: 100%;
+				max-width: 750px;
+				margin: 0 auto;
+			}
+
+			header {
+				display: flex;
+				flex-direction: column;
+				gap: 0.5rem;
+				margin-bottom: 2rem;
+				width: 100%;
+			}
+
+			.back-link {
+				display: inline-flex;
+				align-items: center;
+				gap: 0.5rem;
+				color: var(--text-muted);
+				font-size: 0.875rem;
+				font-weight: 500;
+				text-decoration: none;
+				margin-bottom: 1rem;
+				align-self: flex-start;
+				transition: color 0.2s ease;
+			}
+
+			.back-link:hover {
+				color: var(--text-color);
+			}
+
+			.back-link svg {
+				width: 1rem;
+				height: 1rem;
+			}
+
+			h1 {
+				font-size: 1.85rem;
+				font-weight: 700;
+				letter-spacing: -0.02em;
+			}
+
+			.subtitle {
+				font-size: 1rem;
+				color: var(--text-muted);
+			}
+
+			.grid {
+				display: grid;
+				grid-template-columns: 1fr;
+				gap: 1.5rem;
+				margin-bottom: 3rem;
+			}
+
+			@media (min-width: 640px) {
+				.grid {
+					grid-template-columns: 1.2fr 0.8fr;
+				}
+			}
+
+			.card {
+				background-color: var(--card-bg);
+				border: 1px solid var(--border-color);
+				border-radius: 1rem;
+				box-shadow: var(--shadow-lg);
+				padding: 1.5rem;
+				transition: border-color 0.3s ease, background-color 0.3s ease;
+			}
+
+			.card-title {
+				font-size: 1rem;
+				font-weight: 700;
+				text-transform: uppercase;
+				letter-spacing: 0.05em;
+				color: var(--text-muted);
+				margin-bottom: 1rem;
+				border-bottom: 1px solid var(--border-color);
+				padding-bottom: 0.5rem;
+			}
+
+			/* Contact section style overrides */
+			.contact-details {
+				display: flex;
+				flex-direction: column;
+				gap: 1rem;
+			}
+
+			.contact-item {
+				display: flex;
+				flex-direction: column;
+				gap: 0.25rem;
+			}
+
+			.contact-label {
+				font-size: 0.6875rem;
+				font-weight: 700;
+				text-transform: uppercase;
+				letter-spacing: 0.05em;
+				color: var(--text-muted);
+			}
+
+			.contact-value {
+				font-size: 0.95rem;
+				font-weight: 500;
+			}
+
+			.contact-value a {
+				color: inherit;
+				text-decoration: none;
+				transition: color 0.15s ease;
+			}
+
+			.contact-value a:hover {
+				text-decoration: underline;
+			}
+
+			footer {
+				margin-top: auto;
+				text-align: center;
+				padding-top: 2rem;
+				color: var(--text-muted);
+				font-size: 0.8125rem;
+				width: 100%;
+			}
+		</style>
+	</head>
+	<body>
+		<main>
+			<header>
+				<a href="/" class="back-link">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+						<line x1="19" y1="12" x2="5" y2="12"></line>
+						<polyline points="12 19 5 12 12 5"></polyline>
+					</svg>
+					Back to Tracker
+				</a>
+				<h1>{general.brandName}</h1>
+				<p class="subtitle">Store Location & Opening Hours</p>
+			</header>
+
+			<div class="grid">
+				<!-- Hours Widget Card -->
+				<section class="card">
+					<h2 class="card-title">Opening Hours</h2>
+					{openingHours ? (
+						<OpeningHours 
+							config={openingHours} 
+							layout="full"
+							dayFormat="long" 
+							timeFormat="12h" 
+						/>
+					) : (
+						<p style="color: var(--text-muted);">No opening hours configured.</p>
+					)}
+				</section>
+
+				<!-- Location & Contact Card -->
+				<section class="card">
+					<h2 class="card-title">Contact & Location</h2>
+					<div class="contact-details">
+						<div class="contact-item">
+							<span class="contact-label">Shop Address</span>
+							<span class="contact-value">
+								123 Main Street<br />
+								Suite A<br />
+								Anytown, NY 10001
+							</span>
+						</div>
+
+						<div class="contact-item" style="margin-top: 0.5rem;">
+							<span class="contact-label">Phone Number</span>
+							<span class="contact-value">
+								<a href="tel:5551234567">(555) 123-4567</a>
+							</span>
+						</div>
+
+						<div class="contact-item" style="margin-top: 0.5rem;">
+							<span class="contact-label">Support Email</span>
+							<span class="contact-value">
+								<a href="mailto:support@mainstreetshoerepair.com">support@shoerepair.com</a>
+							</span>
+						</div>
+
+						<div class="contact-item" style="margin-top: 0.5rem;">
+							<span class="contact-label">Directions</span>
+							<span class="contact-value" style="font-size: 0.8125rem; color: var(--text-muted); line-height: 1.4;">
+								Located next to the historic public library. Free parking is available at the rear of the shop.
+							</span>
+						</div>
+					</div>
+				</section>
+			</div>
+
+			<footer>
+				<p>{general.footerText}</p>
+			</footer>
+		</main>
+	</body>
+</html>
