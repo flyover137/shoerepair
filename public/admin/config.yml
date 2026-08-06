@@ -1,6 +1,6 @@
 backend:
   name: github
-  repo: flyover137/shoerepair
+  repo: flyover137/ticket-tracker
   branch: main
   auth_methods: [token]
 
