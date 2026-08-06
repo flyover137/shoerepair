@@ -1,7 +1,7 @@
 ---
 import { getCollection, getEntry } from 'astro:content';
 import OpeningHours from 'astro-opening-hours/OpeningHours.astro';
-import TicketTracker from 'astro-progress-tracker/TicketTracker.astro';
+import TicketTracker from 'astro-ticket-tracker/TicketTracker.astro';
 
 const ticketEntries = await getCollection('tickets');
 const tickets = ticketEntries.map(entry => entry.data);

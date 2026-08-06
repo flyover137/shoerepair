@@ -2,7 +2,7 @@ import { defineCollection } from 'astro:content';
 import { glob, file } from 'astro/loaders';
 import { z } from 'astro/zod';
 import { openingHoursConfigSchema } from 'astro-opening-hours';
-import { ticketSchema } from 'astro-progress-tracker';
+import { ticketSchema } from 'astro-ticket-tracker';
 
 const tickets = defineCollection({
   loader: glob({ pattern: '**/*.json', base: './src/content/tickets' }),
