@@ -1,6 +1,6 @@
 {
   "name": "astro-opening-hours",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A standalone, highly customizable, and timezone-aware opening hours widget for Astro and Sveltia CMS.",
   "type": "module",
   "main": "./dist/index.js",

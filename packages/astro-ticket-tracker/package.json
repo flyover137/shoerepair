@@ -1,6 +1,6 @@
 {
   "name": "astro-ticket-tracker",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A standalone, highly customizable, and domain-neutral customer progress and ticket tracker dashboard component for Astro.",
   "type": "module",
   "main": "./dist/index.js",
