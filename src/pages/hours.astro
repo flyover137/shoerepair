@@ -30,13 +30,13 @@ const openingHours = openingHoursEntry ? openingHoursEntry.data : null;
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<link rel="preconnect" href="https://fonts.googleapis.com">
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 		<style>
 			:root {
 				--bg-color: #f8fafc;
 				--card-bg: #ffffff;
 				--text-color: #0f172a;
-				--text-muted: #64748b;
+				--text-muted: #475569;
 				--border-color: #e2e8f0;
 				--shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 				--shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
@@ -48,7 +48,7 @@ const openingHours = openingHoursEntry ? openingHoursEntry.data : null;
 					--bg-color: #0f172a;
 					--card-bg: #1e293b;
 					--text-color: #f8fafc;
-					--text-muted: #94a3b8;
+					--text-muted: #cbd5e1;
 					--border-color: #334155;
 				}
 			}

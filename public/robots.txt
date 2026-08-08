@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Disallow access to administration panels
+Disallow: /admin/
